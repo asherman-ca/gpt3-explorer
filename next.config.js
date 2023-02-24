@@ -5,6 +5,11 @@ module.exports = {
 		appDir: true,
 	},
 	images: {
-		domains: ['links.papareact.com', 'upload.wikimedia.org', 'seeklogo.com'],
+		domains: [
+			'links.papareact.com',
+			'upload.wikimedia.org',
+			'seeklogo.com',
+			'brandlogovector.com',
+		],
 	},
 }

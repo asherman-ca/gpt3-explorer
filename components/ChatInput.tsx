@@ -63,7 +63,7 @@ function ChatInput({ chatId }: Props) {
 				model,
 				session,
 			}),
-		}).then(() => {
+		}).then((res) => {
 			toast.success('ChatGPT has responded', {
 				id: notification,
 			})
