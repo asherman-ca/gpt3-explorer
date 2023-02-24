@@ -3,6 +3,9 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 import { FormEvent, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db } from '../firebase'
+import { toast } from 'react-hot-toast'
 
 type Props = {
 	chatId: string
@@ -12,6 +15,8 @@ function ChatInput({ chatId }: Props) {
 	const [prompt, setPrompt] = useState('')
 	const { data: session } = useSession()
 
+	const model = 'text-davinci-003'
+
 	const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		if (!prompt) return
@@ -19,6 +24,50 @@ function ChatInput({ chatId }: Props) {
 		// get rid of whitespace
 		const input = prompt.trim()
 		setPrompt('')
+
+		const message: Message = {
+			text: input,
+			createdAt: serverTimestamp(),
+			user: {
+				_id: session?.user?.email!,
+				name: session?.user?.name!,
+				avatar:
+					session?.user?.image! ||
+					`https://ui-avatars.com/api/?name=${session?.user?.name}`,
+			},
+		}
+
+		await addDoc(
+			collection(
+				db,
+				'users',
+				session?.user?.email!,
+				'chats',
+				chatId,
+				'messages'
+			),
+			message
+		)
+
+		// toast to say loading
+		const notification = toast.loading('chatGPT is thinking...')
+
+		await fetch('/api/askQuestion', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				prompt: input,
+				chatId,
+				model,
+				session,
+			}),
+		}).then(() => {
+			toast.success('ChatGPT has responded', {
+				id: notification,
+			})
+		})
 	}
 
 	return (
