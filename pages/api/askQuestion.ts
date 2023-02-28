@@ -24,11 +24,7 @@ export default async function handler(
 		return
 	}
 
-	console.log('serv promp', prompt)
-
-	const response = (await query(prompt, chatId, model)) as any
-
-	console.log('serv res', response)
+	const response = await query(prompt, chatId, model)
 
 	const message: Message = {
 		text: response || 'Chat GPT could not find an answer for that!',
