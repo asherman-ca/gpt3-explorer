@@ -1,5 +1,6 @@
 'use client'
 
+import useSWR from 'swr'
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 import { FormEvent, useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -16,7 +17,10 @@ function ChatInput({ chatId }: Props) {
 	const [prompt, setPrompt] = useState('')
 	const { data: session } = useSession()
 
-	const model = 'text-davinci-003'
+	// const model = 'text-davinci-003'
+	const { data: model } = useSWR('model', {
+		fallbackData: 'text-davinci-003',
+	})
 
 	const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
